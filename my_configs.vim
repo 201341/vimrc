@@ -32,3 +32,5 @@ nnoremap <Leader>u :execute 'CtrlPFunky ' . expand('<cword>')<Cr>
 let g:ctrlp_funky_syntax_highlight = 1
 
 let g:ctrlp_extensions = ['funky']
+
+set path=.,/usr/include,/usr/local/include
