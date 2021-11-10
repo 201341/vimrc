@@ -54,7 +54,10 @@ map <leader>j :CtrlP<cr>
 map <leader>b :CtrlPBuffer<cr>
 
 let g:ctrlp_max_height = 20
-let g:ctrlp_custom_ignore = 'node_modules\|^\.DS_Store\|^\.git\|^\.coffee'
+let g:ctrlp_custom_ignore = {
+         \ 'dir' : 'node_modules\|^\.DS_Store\|^\.git\|^\.coffee',
+         \ 'file' : '\v\.(d|so|a|o|cmd|swp|pyc)',
+         \ }
 
 
 """"""""""""""""""""""""""""""
@@ -75,7 +78,7 @@ let g:snipMate = { 'snippet_version' : 1 }
 """"""""""""""""""""""""""""""
 " => Vim grep
 """"""""""""""""""""""""""""""
-let Grep_Skip_Dirs = 'RCS CVS SCCS .svn generated'
+let Grep_Skip_Dirs = 'RCS CVS SCCS .svn .git generated'
 set grepprg=/bin/grep\ -nH
 
 
@@ -152,9 +155,10 @@ nnoremap <silent> <leader>z :Goyo<cr>
 " => Ale (syntax checker and linter)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ale_linters = {
-\   'javascript': ['eslint'],
 \   'python': ['flake8'],
-\   'go': ['go', 'golint', 'errcheck']
+\   'go': ['go', 'golint', 'errcheck'],
+\   'c': ['gcc', 'cppcheck'],
+\   'cpp': ['gcc', 'cppcheck']
 \}
 
 nmap <silent> <leader>a <Plug>(ale_next_wrap)
@@ -165,7 +169,10 @@ let g:ale_set_highlights = 0
 " Only run linting when saving the file
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter = 0
-
+let g:ale_c_gcc_options = '-Wall -O2 -std=c99'
+let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++11'
+let g:ale_c_cppcheck_options = ''
+let g:ale_cpp_cppcheck_options = ''
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Git gutter (Git diff)
