@@ -1,0 +1,6 @@
+[submodule "my_plugins/vim-gutentags"]
+	path = my_plugins/vim-gutentags
+	url = https://github.com/ludovicchabant/vim-gutentags.git
+[submodule "my_plugins/gutentags_plus"]
+	path = my_plugins/gutentags_plus
+	url = https://github.com/skywind3000/gutentags_plus.git
