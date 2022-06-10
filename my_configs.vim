@@ -1,11 +1,12 @@
 map <c-]> g<c-]>
+
 set completeopt=menu,menuone
 let OmniCpp_MayCompleteDot=1    "  打开  . 操作符
 let OmniCpp_MayCompleteArrow=1  " 打开 -> 操作符
 let OmniCpp_MayCompleteScope=1  " 打开 :: 操作符
 let OmniCpp_NamespaceSearch=1   " 打开命名空间
 let OmniCpp_GlobalScopeSearch=1
-let OmniCpp_DefaultNamespace=["std"]
+let OmniCpp_DefaultNamespace=["std","_GLIBCXX_STD"]
 let OmniCpp_ShowPrototypeInAbbr=1  " 打开显示函数原型
 let OmniCpp_SelectFirstItem = 2 " 自动弹出时自动跳至第一个
 autocmd BufRead scp://* :set bt=acwrite
@@ -20,8 +21,8 @@ au FileType java setlocal dict+=~/.vim_runtime/dictionary/java_keywords_list.txt
 set number
 
 " 自动消除行尾空格
-autocmd BufWritePre *.cpp :%s/\s\+$//e
-autocmd BufWritePre *.h :%s/\s\+$//e
+  " autocmd BufWritePre *.cpp :%s/\s\+$//e
+  " autocmd BufWritePre *.h :%s/\s\+$//e
 
 "
 inoremap jj <Esc>
@@ -33,15 +34,37 @@ let g:ctrlp_funky_syntax_highlight = 1
 
 let g:ctrlp_extensions = ['funky']
 
+set tags+=./tags
 set path=.,/usr/include,/usr/local/include
 
 let g:indent_guides_start_level = 1
 " 缩进线宽度
 let g:indent_guides_guide_size = 1
-colorscheme desert
+colorscheme pyte
+set background=dark
+
 let g:indent_guides_auto_colors = 0
 let g:indent_guides_auto_colors = 0
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=3
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=4
-" hi IndentGuidesOdd  ctermbg=black
-" hi IndentGuidesEven ctermbg=darkgrey
+hi IndentGuidesOdd  ctermbg=black
+hi IndentGuidesEven ctermbg=darkgrey
+"
+set tabstop=3
+set shiftwidth=3
+set expandtab
+set textwidth=70
+
+let g:cpp_posix_standard = 1
+let g:cpp_class_decl_highlight = 1
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+
+highlight WhitespaceEOL ctermbg=red guibg=red
+match WhitespaceEOL /\s\+$/
+
+set cursorcolumn
+set cursorline
+
+highlight CursorLine   cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=White
+highlight CursorColumn cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=white
