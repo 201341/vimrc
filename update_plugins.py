@@ -44,7 +44,6 @@ vim-repeat https://github.com/tpope/vim-repeat
 vim-commentary https://github.com/tpope/vim-commentary
 vim-gitgutter https://github.com/airblade/vim-gitgutter
 gruvbox https://github.com/morhetz/gruvbox
-vim-flake8 https://github.com/nvie/vim-flake8
 vim-pug https://github.com/digitaltoad/vim-pug
 lightline.vim https://github.com/itchyny/lightline.vim
 lightline-ale https://github.com/maximbaz/lightline-ale
