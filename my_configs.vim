@@ -12,9 +12,9 @@ let OmniCpp_SelectFirstItem = 2 " 自动弹出时自动跳至第一个
 autocmd BufRead scp://* :set bt=acwrite
 
 " 添加自动补全字典
-au FileType php setlocal dict+=~/.vim_runtime/dictionary/php_keywords_list.txt
+" au FileType php setlocal dict+=~/.vim_runtime/dictionary/php_keywords_list.txt
 au FileType cpp setlocal dict+=~/.vim_runtime/dictionary/cpp_keywords_list.txt
-au FileType java setlocal dict+=~/.vim_runtime/dictionary/java_keywords_list.txt
+" au FileType java setlocal dict+=~/.vim_runtime/dictionary/java_keywords_list.txt
 " au FileType markdown setlocal dict+=~/.vim/dictionary/words.txt
 "
 
@@ -38,10 +38,9 @@ set tags+=./tags
 set path=.,/usr/include,/usr/local/include
 
 let g:indent_guides_start_level = 1
-" 缩进线宽度
 let g:indent_guides_guide_size = 1
-colorscheme pyte
-set background=dark
+" colorscheme pyte
+" set background=dark
 
 let g:indent_guides_auto_colors = 0
 let g:indent_guides_auto_colors = 0
@@ -65,11 +64,10 @@ match WhitespaceEOL /\s\+$/
 
 set cursorcolumn
 set cursorline
-
 highlight CursorLine   cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=White
 highlight CursorColumn cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=white
 
-
+" youcompleteme
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_server_log_level = 'info'
@@ -103,4 +101,14 @@ nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
 nnoremap <leader>jc :YcmCompleter GoToCallers<CR>
 nnoremap <leader>jce :YcmCompleter GoToCallees<CR>
 
-
+" ctrlsf
+let g:ctrlsf_position = 'right'
+let g:ctrlsf_regex_pattern = 1
+let g:ctrlsf_case_sensitive = 'yes'
+let g:ctrlsf_default_root = 'project'
+let g:ctrlsf_auto_close = 0
+let g:ctrlsf_populate_qflist = 1
+let g:ctrlsf_search_mode = 'async'
+let g:ctrlsf_winsize = '30%'
+" let g:ctrlsf_default_view_mode = 'compact'
+nmap <Leader>j :CtrlSF<CR>
