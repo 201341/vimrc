@@ -22,7 +22,6 @@ vim-yankstack https://github.com/maxbrunsfeld/vim-yankstack
 ack.vim https://github.com/mileszs/ack.vim
 bufexplorer https://github.com/jlanzarotta/bufexplorer
 ctrlp.vim https://github.com/ctrlpvim/ctrlp.vim
-mayansmoke https://github.com/vim-scripts/mayansmoke
 nerdtree https://github.com/preservim/nerdtree
 open_file_under_cursor.vim https://github.com/amix/open_file_under_cursor.vim
 tlib https://github.com/tomtom/tlib_vim
@@ -44,7 +43,6 @@ vim-repeat https://github.com/tpope/vim-repeat
 vim-commentary https://github.com/tpope/vim-commentary
 vim-gitgutter https://github.com/airblade/vim-gitgutter
 gruvbox https://github.com/morhetz/gruvbox
-vim-pug https://github.com/digitaltoad/vim-pug
 lightline.vim https://github.com/itchyny/lightline.vim
 lightline-ale https://github.com/maximbaz/lightline-ale
 vim-abolish https://github.com/tpope/vim-abolish
