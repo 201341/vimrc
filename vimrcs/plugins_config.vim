@@ -59,14 +59,6 @@ let g:ctrlp_custom_ignore = {
          \ 'file' : '\v\.(d|so|a|o|cmd|swp|pyc)',
          \ }
 
-
-""""""""""""""""""""""""""""""
-" => ZenCoding
-""""""""""""""""""""""""""""""
-" Enable all functions in all modes
-let g:user_zen_mode='a'
-
-
 """"""""""""""""""""""""""""""
 " => snipMate (beside <TAB> support <CTRL-j>)
 """"""""""""""""""""""""""""""
