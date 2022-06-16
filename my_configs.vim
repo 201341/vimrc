@@ -69,8 +69,6 @@ set cursorline
 highlight CursorLine   cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=White
 highlight CursorColumn cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=white
 
-highlight PMenu ctermfg=0 ctermbg=242 guifg=black guibg=darkgrey
-highlight PMenuSel ctermfg=242 ctermbg=8 guifg=darkgrey guibg=black
 
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_show_diagnostics_ui = 0
@@ -78,6 +76,7 @@ let g:ycm_server_log_level = 'info'
 let g:ycm_min_num_identifier_candidate_chars = 2
 let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:ycm_complete_in_strings=1
+let g:ycm_enable_semantic_highlighting=1
 let g:ycm_key_invoke_completion = '<c-z>'
 set completeopt=menu,menuone
 
@@ -96,3 +95,12 @@ let g:ycm_filetype_whitelist = {
 			\ "zsh":1,
 			\ "zimbu":1,
 			\ }
+
+nnoremap <leader>jl :YcmCompleter GoToDeclaration<CR>
+nnoremap <leader>jd :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>ji :YcmCompleter GoToImplementation<CR>
+nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
+nnoremap <leader>jc :YcmCompleter GoToCallers<CR>
+nnoremap <leader>jce :YcmCompleter GoToCallees<CR>
+
+
