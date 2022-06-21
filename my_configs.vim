@@ -64,8 +64,8 @@ match WhitespaceEOL /\s\+$/
 
 set cursorcolumn
 set cursorline
-highlight CursorLine   cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=White
-highlight CursorColumn cterm=NONE ctermbg=lightgreen ctermfg=white guibg=lightgreen guifg=white
+highlight CursorLine   cterm=NONE ctermbg=lightgray ctermfg=white guibg=lightgreen guifg=White
+highlight CursorColumn cterm=NONE ctermbg=lightgray ctermfg=white guibg=lightgreen guifg=white
 
 " youcompleteme
 let g:ycm_add_preview_to_completeopt = 0
@@ -76,6 +76,8 @@ let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:ycm_complete_in_strings=1
 let g:ycm_enable_semantic_highlighting=1
 let g:ycm_key_invoke_completion = '<c-z>'
+let g:ycm_auto_hover=''
+
 set completeopt=menu,menuone
 
 noremap <c-z> <NOP>
@@ -100,7 +102,7 @@ nnoremap <leader>ji :YcmCompleter GoToImplementation<CR>
 nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
 nnoremap <leader>jc :YcmCompleter GoToCallers<CR>
 nnoremap <leader>jce :YcmCompleter GoToCallees<CR>
-
+nmap <leader>jh <plug>(YCMHover)
 " ctrlsf
 let g:ctrlsf_position = 'right'
 let g:ctrlsf_regex_pattern = 1
