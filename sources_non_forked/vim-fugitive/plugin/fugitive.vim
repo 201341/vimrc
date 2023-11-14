@@ -23,7 +23,7 @@ function! FugitiveGitDir(...) abort
       return g:fugitive_event
     endif
     let dir = get(b:, 'git_dir', '')
-    if empty(dir) && (empty(bufname('')) || &buftype =~# '^\%(nofile\|acwrite\|quickfix\|terminal\|prompt\)$')
+    if empty(dir) && (empty(bufname('')) && &filetype !=# 'netrw' || &buftype =~# '^\%(nofile\|acwrite\|quickfix\|terminal\|prompt\)$')
       return FugitiveExtractGitDir(getcwd())
     elseif (!exists('b:git_dir') || b:git_dir =~# s:bad_git_dir) && &buftype =~# '^\%(nowrite\)\=$'
       let b:git_dir = FugitiveExtractGitDir(bufnr(''))
@@ -39,7 +39,7 @@ function! FugitiveGitDir(...) abort
   elseif type(a:1) == type('')
     return substitute(s:Slash(a:1), '/$', '', '')
   elseif type(a:1) == type({})
-    return get(a:1, 'git_dir', '')
+    return get(a:1, 'fugitive_dir', get(a:1, 'git_dir', ''))
   else
     return ''
   endif
@@ -91,12 +91,11 @@ function! FugitiveParse(...) abort
   if path !~# '^fugitive://'
     return ['', '']
   endif
-  let vals = matchlist(path, s:dir_commit_file)
-  if len(vals)
-    return [(vals[2] =~# '^.\=$' ? ':' : '') . vals[2] . substitute(vals[3], '^/', ':', ''), vals[1]]
+  let [rev, dir] = fugitive#Parse(path)
+  if !empty(dir)
+    return [rev, dir]
   endif
-  let v:errmsg = 'fugitive: invalid Fugitive URL ' . path
-  throw v:errmsg
+  throw 'fugitive: invalid Fugitive URL ' . path
 endfunction
 
 " FugitiveGitVersion() queries the version of Git in use.  Pass up to 3
@@ -141,7 +140,7 @@ function! FugitiveExecute(args, ...) abort
   return call('fugitive#Execute', [a:args] + a:000)
 endfunction
 
-" FugitiveShellCommand() turns an array of arugments into a Git command string
+" FugitiveShellCommand() turns an array of arguments into a Git command string
 " which can be executed with functions like system() and commands like :!.
 " Integer arguments will be treated as buffer numbers, and the appropriate
 " relative path inserted in their place.
@@ -423,14 +422,17 @@ endfunction
 
 function! FugitiveExtractGitDir(path) abort
   if type(a:path) ==# type({})
-    return get(a:path, 'git_dir', '')
+    return get(a:path, 'fugitive_dir', get(a:path, 'git_dir', ''))
   elseif type(a:path) == type(0)
     let path = s:Slash(a:path > 0 ? bufname(a:path) : bufname(''))
+    if getbufvar(a:path, '&filetype') ==# 'netrw'
+      let path = s:Slash(getbufvar(a:path, 'netrw_curdir', path))
+    endif
   else
     let path = s:Slash(a:path)
   endif
   if path =~# '^fugitive://'
-    return get(matchlist(path, s:dir_commit_file), 1, '')
+    return fugitive#Parse(path)[1]
   elseif empty(path)
     return ''
   endif
@@ -486,8 +488,6 @@ endfunction
 
 if exists('+shellslash')
 
-  let s:dir_commit_file = '\c^fugitive://\%(/\a\@=\)\=\(.\{-\}\)//\%(\(\x\{40,\}\|[0-3]\)\(/.*\)\=\)\=$'
-
   function! s:Slash(path) abort
     return tr(a:path, '\', '/')
   endfunction
@@ -501,8 +501,6 @@ if exists('+shellslash')
   endfunction
 
 else
-
-  let s:dir_commit_file = '\c^fugitive://\(.\{-\}\)//\%(\(\x\{40,\}\|[0-3]\)\(/.*\)\=\)\=$'
 
   function! s:Slash(path) abort
     return a:path
@@ -527,7 +525,7 @@ endif
 function! s:ProjectionistDetect() abort
   let file = s:Slash(get(g:, 'projectionist_file', ''))
   let dir = FugitiveExtractGitDir(file)
-  let base = get(matchlist(file, s:dir_commit_file), 1, '')
+  let base = matchstr(file, '^fugitive://.\{-\}//\x\+')
   if empty(base)
     let base = s:Tree(dir)
   endif
@@ -554,9 +552,6 @@ command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#Complete Git exe
 if exists(':Gstatus') != 2 && get(g:, 'fugitive_legacy_commands', 0)
   exe 'command! -bang -bar     -range=-1' s:addr_other 'Gstatus exe fugitive#Command(<line1>, <count>, +"<range>", <bang>0, "<mods>", <q-args>)'
         \ '|echohl WarningMSG|echomsg ":Gstatus is deprecated in favor of :Git (with no arguments)"|echohl NONE'
-elseif exists(':Gstatus') != 2 && !exists('g:fugitive_legacy_commands')
-  exe 'command! -bang -bar     -range=-1' s:addr_other 'Gstatus'
-        \ ' echoerr ":Gstatus has been removed in favor of :Git (with no arguments)"'
 endif
 
 for s:cmd in ['Commit', 'Revert', 'Merge', 'Rebase', 'Pull', 'Push', 'Fetch', 'Blame']
@@ -564,9 +559,6 @@ for s:cmd in ['Commit', 'Revert', 'Merge', 'Rebase', 'Pull', 'Push', 'Fetch', 'B
     exe 'command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#' . s:cmd . 'Complete G' . tolower(s:cmd)
           \ 'echohl WarningMSG|echomsg ":G' . tolower(s:cmd) . ' is deprecated in favor of :Git ' . tolower(s:cmd) . '"|echohl NONE|'
           \ 'exe fugitive#Command(<line1>, <count>, +"<range>", <bang>0, "<mods>", "' . tolower(s:cmd) . ' " . <q-args>)'
-  elseif exists(':G' . tolower(s:cmd)) != 2 && !exists('g:fugitive_legacy_commands')
-    exe 'command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#' . s:cmd . 'Complete G' . tolower(s:cmd)
-          \ 'echoerr ":G' . tolower(s:cmd) . ' has been removed in favor of :Git ' . tolower(s:cmd) . '"'
   endif
 endfor
 unlet s:cmd
@@ -577,13 +569,6 @@ exe "command! -bar -bang -nargs=? -complete=customlist,fugitive#CdComplete Glcd 
 exe 'command! -bang -nargs=? -range=-1' s:addr_wins '-complete=customlist,fugitive#GrepComplete Ggrep  exe fugitive#GrepCommand(<line1>, <count>, +"<range>", <bang>0, "<mods>", <q-args>)'
 exe 'command! -bang -nargs=? -range=-1' s:addr_wins '-complete=customlist,fugitive#GrepComplete Glgrep exe fugitive#GrepCommand(0, <count> > 0 ? <count> : 0, +"<range>", <bang>0, "<mods>", <q-args>)'
 
-if exists(':Glog') != 2 && get(g:, 'fugitive_legacy_commands', 0)
-  exe 'command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#LogComplete Glog  :exe fugitive#LogCommand(<line1>,<count>,+"<range>",<bang>0,"<mods>",<q-args>, "")'
-        \ '|echohl WarningMSG|echomsg ":Glog is deprecated in favor of :Gclog"|echohl NONE'
-elseif exists(':Glog') != 2 && !exists('g:fugitive_legacy_commands')
-  exe 'command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#LogComplete Glog'
-        \ ' echoerr ":Glog has been removed in favor of :Gclog"'
-endif
 exe 'command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#LogComplete Gclog :exe fugitive#LogCommand(<line1>,<count>,+"<range>",<bang>0,"<mods>",<q-args>, "c")'
 exe 'command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#LogComplete GcLog :exe fugitive#LogCommand(<line1>,<count>,+"<range>",<bang>0,"<mods>",<q-args>, "c")'
 exe 'command! -bang -nargs=? -range=-1 -complete=customlist,fugitive#LogComplete Gllog :exe fugitive#LogCommand(<line1>,<count>,+"<range>",<bang>0,"<mods>",<q-args>, "l")'
@@ -595,6 +580,7 @@ exe 'command! -bar -bang -nargs=*                          -complete=customlist,
 exe 'command! -bar -bang -nargs=* -range=-1' s:addr_other '-complete=customlist,fugitive#EditComplete   Gsplit   exe fugitive#Open((<count> > 0 ? <count> : "").(<count> ? "split" : "edit"), <bang>0, "<mods>", <q-args>)'
 exe 'command! -bar -bang -nargs=* -range=-1' s:addr_other '-complete=customlist,fugitive#EditComplete   Gvsplit  exe fugitive#Open((<count> > 0 ? <count> : "").(<count> ? "vsplit" : "edit!"), <bang>0, "<mods>", <q-args>)'
 exe 'command! -bar -bang -nargs=* -range=-1' s:addr_tabs  '-complete=customlist,fugitive#EditComplete   Gtabedit exe fugitive#Open((<count> >= 0 ? <count> : "")."tabedit", <bang>0, "<mods>", <q-args>)'
+exe 'command! -bar -bang -nargs=*                          -complete=customlist,fugitive#EditComplete   Gdrop    exe fugitive#DropCommand(<line1>, <count>, +"<range>", <bang>0, "<mods>", <q-args>)'
 
 if exists(':Gr') != 2
   exe 'command! -bar -bang -nargs=* -range=-1                -complete=customlist,fugitive#ReadComplete   Gr     exe fugitive#ReadCommand(<line1>, <count>, +"<range>", <bang>0, "<mods>", <q-args>)'
@@ -624,7 +610,7 @@ if exists(':Gdelete') != 2 && get(g:, 'fugitive_legacy_commands', 0)
   exe 'command! -bar -bang -nargs=0 Gdelete exe fugitive#DeleteCommand(<line1>, <count>, +"<range>", <bang>0, "<mods>", <q-args>)'
         \ '|echohl WarningMSG|echomsg ":Gdelete is deprecated in favor of :GDelete"|echohl NONE'
 elseif exists(':Gdelete') != 2 && !exists('g:fugitive_legacy_commands')
-  exe 'command! -bar -bang -nargs=0 Gdelete echoerr ":Gremove has been removed in favor of :GRemove"'
+  exe 'command! -bar -bang -nargs=0 Gdelete echoerr ":Gdelete has been removed in favor of :GDelete"'
 endif
 if exists(':Gmove') != 2 && get(g:, 'fugitive_legacy_commands', 0)
   exe 'command! -bar -bang -nargs=1 -complete=customlist,fugitive#CompleteObject Gmove   exe fugitive#MoveCommand(  <line1>, <count>, +"<range>", <bang>0, "<mods>", <q-args>)'
@@ -706,6 +692,9 @@ augroup fugitive
         \ if FugitiveIsGitDir(expand('<amatch>:p:h')) |
         \   let b:git_dir = s:Slash(expand('<amatch>:p:h')) |
         \   exe fugitive#BufReadStatus(v:cmdbang) |
+        \   echohl WarningMSG |
+        \   echo "fugitive: Direct editing of .git/" . expand('%:t') . " is deprecated" |
+        \   echohl NONE |
         \ elseif filereadable(expand('<amatch>')) |
         \   silent doautocmd BufReadPre |
         \   keepalt noautocmd read <amatch> |
